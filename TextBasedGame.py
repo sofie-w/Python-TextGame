@@ -1,20 +1,19 @@
 import random
+import os
+import sys
 
 hight = 4
 width = 4
 
 class Room:
-    def __init__(self, _room_name, _world):
+    def __init__(self, _room_name, _world, _item):
         #mana.add_room(self)
         self.exits = []
+        self.items = []
+        self.items.append(_item)
         self.world = _world
         self.name = _room_name
         
-        #self.description = ""
-#          self.description = _uitleg
-        
-    def test(self):
-        print("test")
     
     def add_exit(self, x, y):
         if x-1 >= 0:
@@ -32,11 +31,19 @@ class Room:
         
          
         
-    def describe(self, room):
-        print('Je bent nu in de ' + room + '.') # Maak grammatica correct bij alle kamers!
+    def describe(self):
+        print('Je bent nu in de ' + self.name + '. Je ziet een '+ self.items[0].item_name + ' liggen.') # Maak grammatica correct bij alle kamers!
+        vraag = input('Wil je dit meenemen(y/n): ')
+        if vraag == 'y':
+            item = self.items[0]
+            self.items.remove(self.items[0])
+            return(item)
+            
+        else:
+            return(0)
+            
         
-        
-        
+            
         
         
 
@@ -54,49 +61,46 @@ class World:
         #Voegt alle kamers toe
         #Zorg dat hight * width even is als het aantal kamers
         
-        keuken = Room('keuken', self)
+        keuken = Room('keuken', self, appel)
         self.add_room(keuken)
-        woonkamer = Room('woonkamer', self)
+        woonkamer = Room('woonkamer', self, appel)
         self.add_room(woonkamer)
-        eetkamer = Room('eetkamer', self)
+        eetkamer = Room('eetkamer', self, sleutel_goud)
         self.add_room(eetkamer)
-        badkamer = Room('badkamer', self)
+        badkamer = Room('badkamer', self, zwaard)
         self.add_room(badkamer)
-        gang = Room('gang', self)
+        gang = Room('gang', self, appel)
         self.add_room(gang)
-        balkon = Room('balkon', self) #!
+        balkon = Room('balkon', self, appel) #!
         self.add_room(balkon)
-        tuin = Room('tuin', self)
+        tuin = Room('tuin', self, sleutel_goud)
         self.add_room(tuin)
-        bibliotheek = Room('bibliotheek', self)
+        bibliotheek = Room('bibliotheek', self, appel)
         self.add_room(bibliotheek)
-        slaapkamer = Room('slaapkamer', self)
+        slaapkamer = Room('slaapkamer', self, boog)
         self.add_room(slaapkamer)
-        hobbykamer = Room('hobbykamer', self)
+        hobbykamer = Room('hobbykamer', self, brood)
         self.add_room(hobbykamer)
-        fitnessruimte = Room('fitnessruimte', self)
+        fitnessruimte = Room('fitnessruimte', self, brood)
         self.add_room(fitnessruimte)
-        studeerkamer = Room('studeerkamer', self)
+        studeerkamer = Room('studeerkamer', self, brood)
         self.add_room(studeerkamer)
-        serre = Room('serre', self)
+        serre = Room('serre', self, sleutel_zilver)
         self.add_room(serre)
-        garage = Room('garage', self)
+        garage = Room('garage', self, brood)
         self.add_room(garage)
-        kelder = Room('kelder', self) #!
+        kelder = Room('kelder', self, brood) #!
         self.add_room(kelder)
-        zolder = Room('zolder', self) #!
+        zolder = Room('zolder', self, sleutel_goud) #!
         self.add_room(zolder)
-        #keuken = Room('keuken', '')
-        #self.add_room(keuken)
+
         for i in range(hight):
             for j in range(width):
                 room = random.choice(self.rooms)
-                #print(room, "##")
                 self.world[i][j] = room
                 self.rooms.remove(room)
                 
         self.first_room(person)
-                
                 
         
         
@@ -107,16 +111,15 @@ class World:
         
     def first_room(self, person):
         x = random.randint(0, width-1)
-#         x = 3
         y = random.randint(0, hight-1)
         
         #stop de player in deze kamer eerst:
         firstroom = self.world[x][y]
-        firstroom.describe(firstroom.name)
-        firstroom.add_exit(x,y)
+        #firstroom.describe()
+        #firstroom.add_exit(x,y)
         person.set_current_room(firstroom)
         room = person.get_current_room(self, x,y)
-        print(room)
+        #print(room)
         
         
         
@@ -131,14 +134,23 @@ class Player:
         
     def set_current_room(self, room):
         current_room = room
+        item = current_room.describe()
+        if item != 0:
+            self.pick_up(item)
+            
         
-    
     def get_current_room(self, world, x, y):
         room = world.world[x][y]
         return(room)
     
     def pick_up(self, item):
-        print("hoi")
+        self.inventory.append(item)
+        self.print_inv()
+        
+    def print_inv(self):
+        for i in range(len(self.inventory)):
+            print(self.inventory[i].item_name)
+        
         
         
 class Controller:
@@ -150,6 +162,8 @@ class Controller:
         person = Player()
         mana = World("Mana") 
         mana.create_world(person)
+        clear_screen()
+        print('Lopen: L \nInventory bekijken: I \nHonger bekijken: H')
         
         
         
@@ -158,6 +172,10 @@ class Item:
     def __init__(self, _name, _itemtype):
         self.item_name = _name
         self.item_type = _itemtype
+        
+        
+def clear_screen():
+    py.emptyEcho();
         
         
 
