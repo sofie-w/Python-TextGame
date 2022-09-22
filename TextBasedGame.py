@@ -5,7 +5,6 @@ width = 4
 
 class Room:
     def __init__(self, _room_name, _world, _item):
-        #mana.add_room(self)
         self.exits = []
         self.items = []
         self.items.append(_item)
@@ -44,7 +43,8 @@ class Room:
 
 
     def describe(self):
-        if len(self.exits):
+        #print(len(self.items))
+        if len(self.items) >= 1:
             print('Je bent nu in de ' + self.name + '. Je ziet een '+ self.items[0].item_name + ' liggen.') # Maak grammatica correct bij alle kamers!
             vraag = input('Wil je dit meenemen(y/n): ')
             if vraag == 'y':
@@ -57,6 +57,9 @@ class Room:
         else:
             print('Je bent nu in de ' + self.name + '. De kamer lijkt leeg. Wil je verder(V) gaan of nog even zoeken(Z)')
             keuze = input('(V/Z): ')
+            if keuze == 'Z':
+                print('De kamer is nog steeds leeg')
+            return(0)
 
 
 
@@ -116,7 +119,6 @@ class World:
                 self.world[i][j] = room
                 room.x = i
                 room.y = j
-                print(room.x)
                 self.rooms.remove(room)
 
         self.first_room(person)
@@ -176,9 +178,12 @@ class Player:
 
     def set_current_room(self, room):
         self.current_room = room
-        item = self.current_room.describe()
-        if item != 0:
-            self.pick_up(item)
+        print('Wil je in deze kamer voor spullen kijken(K) of gewoon verder lopen(L): ')
+        door = input('(K/L): ')
+        if door == 'K':
+            item = self.current_room.describe()
+            if item != 0:
+                self.pick_up(item)
 
 
     def get_current_room(self, world, x, y):
@@ -187,7 +192,7 @@ class Player:
 
     def pick_up(self, item):
         self.inventory.append(item)
-        self.print_inv()
+        #self.print_inv()
 
     def print_inv(self):
         print('Appels: '+ str(self.inventory.count(appel)))
@@ -196,6 +201,7 @@ class Player:
         print('Pijl en Boog: '+ str(self.inventory.count(boog)))
         print('Zilvere sleutels: '+ str(self.inventory.count(sleutel_zilver)))
         print('Goude sleutels: '+ str(self.inventory.count(sleutel_goud)))
+        verder = input('Klik enter om verder te gaan...')
 
 
 
@@ -212,7 +218,7 @@ class Controller:
             clear_screen()
             print('Je bent nu in de ' + person.current_room.name)
             print('\nLopen: L \nInventory bekijken: I \nHonger bekijken: H \nStoppen: S')
-            keuze = input("Kies(L/I/H): ")
+            keuze = input("Kies(L/I/H/S): ")
             clear_screen()
             if keuze == 'L':
                 person.goto_room()
@@ -221,8 +227,15 @@ class Controller:
                 person.print_inv()
             elif keuze == 'H':
                 print('H')
+            elif keuze == 'S':
+                print('Doei doei')
+            else:
+                print('Je hebt iets verkeerd getypt, probeer het opnieuw.')
             
-            
+            if sleutel_goud in person.inventory:
+                keuze = 'S'
+                print("Je hebt de goude sleutel gevonden! Je hebt gewonnen")
+                    
 
 
 
