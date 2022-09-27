@@ -10,11 +10,21 @@ class Room:
         self.x = 0
         self.y = 0
         self.add_item(_item)
+        self.monster = self.add_Enemy()
+        print(self.monster)
         
     def add_item(self, item):
         self.items.append(item)
         
-
+    def add_Enemy(self):
+        kies = random.randint(0, 1)
+        if kies == 0:
+            return(Enemy())
+            #self.monster = Enemy()
+        else:
+            return(Enemy_Fire())
+            #self.monster = Enemy_Fire()
+        #print(self.monster)
 
     def add_exit(self):
         if self.x-1 >= 0:
@@ -46,9 +56,10 @@ class Room:
 
     def describe(self):
         #print(len(self.items))
+        print(self.monster.name)
         if len(self.items) >= 1:
-            print('Je bent nu in de ' + self.name + '. Je ziet een '+ self.items[0].item_name + ' liggen.') # Maak grammatica correct bij alle kamers!
-            vraag = input('Wil je dit meenemen(y/n): ')
+            print('Je ziet in de ' + self.name + ' een '+ self.items[0].item_name + ' liggen.') # Maak grammatica correct bij alle kamers!
+            vraag = input('Wil je een ' + self.items[0].item_name + ' meenemen(y/n): ')
             if vraag == 'y':
                 item = self.items[0]
                 self.items.remove(self.items[0])
@@ -65,9 +76,6 @@ class Room:
 
 
 
-
-
-
 class World: #Maakt een random wereld
     def __init__(self, _name):
 
@@ -81,16 +89,15 @@ class World: #Maakt een random wereld
 
     def create_world(self, person):
         
-        for a in range(6):
+        for a in range(5):
             self.poss_items.append(appel)
-        for b in range(6):
+        for b in range(5):
             self.poss_items.append(brood)
         self.poss_items.append(zwaard)
         self.poss_items.append(boog)
         self.poss_items.append(sleutel_goud)
-        self.poss_items.append(sleutel_zilver)
-        
-        
+        for c in range(3):
+            self.poss_items.append(sleutel_zilver)
         
         
         #Voegt alle kamers toe
@@ -188,19 +195,19 @@ class Player: #Lopen en de inventory
             lopen = input("Waar wil je heen(W/A/S/D): ")
             if lopen == 'W' and self.current_room.exits[0] != 'Muur':
                 self.set_current_room(self.current_room.exits[0])
-                self.kijken_lopen()
+                #self.kijken_lopen()
                 door = 'nee'
             elif lopen == 'A' and self.current_room.exits[1] != 'Muur':
                 self.set_current_room(self.current_room.exits[1])
-                self.kijken_lopen()
+                #self.kijken_lopen()
                 door = 'nee'
             elif lopen == 'S' and self.current_room.exits[2] != 'Muur':
                 self.set_current_room(self.current_room.exits[2])
-                self.kijken_lopen()
+                #self.kijken_lopen()
                 door = 'nee'
             elif lopen == 'D' and self.current_room.exits[3] != 'Muur':
                 self.set_current_room(self.current_room.exits[3])
-                self.kijken_lopen()
+                #self.kijken_lopen()
                 door = 'nee'
             else:
                 print("Je hebt een verkeerde weg gekozen of iets verkeerds ingevuld. \nProbeer het opnieuw.")
@@ -210,13 +217,13 @@ class Player: #Lopen en de inventory
         self.current_room = room
         
                 
-    def kijken_lopen(self):
-        print('Wil je in deze kamer voor spullen kijken(K) of verder lopen(L): ')
-        door = input('(K/L): ')
-        if door == 'K':
-            item = self.current_room.describe()
-            if item != 0:
-                self.pick_up(item)
+    def kijken(self):
+        #print('Wil je in deze kamer voor spullen kijken(K) of verder lopen(L): ')
+        #door = input('(K/L): ')
+        #if door == 'K':
+        item = self.current_room.describe()
+        if item != 0:
+            self.pick_up(item)
 
 
     def get_current_room(self, world, x, y):
@@ -259,7 +266,7 @@ class Controller: # Begint het spel en laat het menu zien
             elif keuze == 'I':
                 person.print_inv()
             elif keuze == 'K':
-                person.kijken_lopen()
+                person.kijken()
             elif keuze == 'H':
                 print('H')
             elif keuze == 'S':
@@ -267,7 +274,7 @@ class Controller: # Begint het spel en laat het menu zien
             else:
                 print('Je hebt iets verkeerd getypt, probeer het opnieuw.')
             
-            if sleutel_goud in person.inventory:
+            if person.inventory.count(sleutel_goud) == 3: #Als je 3 sleutels hebt dan win je
                 keuze = 'S'
                 print("Je hebt de goude sleutel gevonden! Je hebt gewonnen")
                     
@@ -279,15 +286,49 @@ class Item: #Geeft de items een naam en een soort
     def __init__(self, _name, _itemtype):
         self.item_name = _name
         self.item_type = _itemtype
+        
+
+class Enemy:
+    def __init__(self):
+        self.life = 5
+        self.max_schade = 3
+        self.name = 'Monster'
+        #self.name = n
+
+    def attack(self):
+        #print("Ouch!")
+        schade_person = random.randint(0,self.max_schade)
+        #print("Je valt het monster aan. Hij heeft nog " + str(self.life) + " levens over")
+
+    def checklife(self):
+        if self.life <= 0:
+            print("I am dead")
+        else:
+            print(str(self.life) + " lifes left.")
+
+    def heal(self):
+        self.life += 2
+    
+    
+class Enemy_Fire(Enemy):
+    def __init__(self):
+        Enemy.__init__(self)
+        self.life = 9
+        self.max_schade = 5
+        self.name = 'Vuur Monster'
+    def attack(self):
+        if random.randint(0, 3) == 1:
+            print('Het monster spuwt vuur naar je toe, het kost je 6 levens.')
+            schade_person = 6
+        
+        else:
+            Enemy.attack(self)
+
 
 
 def clear_screen(): #Maakt het scherm leeg
     #os.system("cls" if os.name == "nt" else "clear")
     print('\n\n\n\n\n\n\n\n\n\n\n') #Tijdelijke oplossing
-
-
-
-#Items in het spel
 
 
 #Hoogte en Breedte van de wereld
@@ -304,3 +345,10 @@ sleutel_zilver = Item('Zilvere Sleutel', 'sleutel')
 
 #Start het spel
 speel = Controller()
+
+
+#Ideeën
+# - Meerdere Enemys verschilende krachten
+# - Levens Potion
+# - 
+
