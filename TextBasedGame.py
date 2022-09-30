@@ -52,28 +52,42 @@ class Room:
             print("Rechts(D): Muur \n")
             self.exits.append("Muur")
 
-
-
+        
+    
     def describe(self):
         #print(len(self.items))
         if len(self.items) >= 1:
             print('Je ziet in de ' + self.name + ' een '+ self.items[0].item_name + ' liggen. Maar er staat een ' + self.monster.name + ' voor.') # Maak grammatica correct bij alle kamers!
             vraag = input('Wil je het '+ self.monster.name +' aanvallen(y/n): ')
-            #vraag = input('Wil je een ' + self.items[0].item_name + ' meenemen(y/n): ')
+            door = 'a'
+            
             if vraag == 'y':
-                while self.monster.life > 0 and person.life > 0:
-                    self.monster.attack()
-                if person.life < 0:
+                while self.monster.life > 0 and person.life > 0 and door != 'v':
+                    door = self.monster.attack()
+                    if self.monster.life > 0 and person.life > 0:
+                        vraag = input('Wil je verder met aanvallen(a) of wil je vluchten(v) (a/v): ')
+                        if vraag == 'a':
+                            clear_screen()
+                            #return(0)
+                        elif vraag == 'v':
+                            door = 'v'
+                if person.life <= 0:
+                    
                     print('Je bent dood')
-                    print(Controller.keuze)
-                    Controller.keuze = 'S'
+                    #print(Controller.keuze)
+                    #Controller.keuze = 'S'
+                    return('S')
                 
-                elif self.monster.life < 0:
+                elif self.monster.life <= 0:
                     print('Je hebt het monster verslagen!')
-                    enter()
-                #item = self.items[0]
-                #self.items.remove(self.items[0])
-                #return(item)
+                    #enter()
+                    vraag2 = input('Wil je een ' + self.items[0].item_name + ' meenemen(y/n): ')
+                    if vraag2 == 'y':
+                        item = self.items[0]
+                        self.items.remove(self.items[0])
+                        return(item)
+                    else:
+                        return(0)
 
             else:
                 return(0)
@@ -234,8 +248,11 @@ class Player: #Lopen en de inventory
         #door = input('(K/L): ')
         #if door == 'K':
         item = self.current_room.describe()
-        if item != 0:
+        if item == 'S':
+            return('S')
+        elif item != 0:
             self.pick_up(item)
+            return('K')
 
 
     def get_current_room(self, world, x, y):
@@ -260,8 +277,6 @@ class Player: #Lopen en de inventory
 class Controller: # Begint het spel en laat het menu zien
     def __init__(self):
         self.keuze = 'L'
-        
-        
 
     def play_game(self):
         mana = World("Mana")
@@ -279,7 +294,7 @@ class Controller: # Begint het spel en laat het menu zien
             elif self.keuze == 'I':
                 person.print_inv()
             elif self.keuze == 'K':
-                person.kijken()
+                self.keuze = person.kijken()
             elif self.keuze == 'H':
                 print('H')
             elif self.keuze == 'S':
@@ -296,9 +311,10 @@ class Controller: # Begint het spel en laat het menu zien
 
 
 class Item: #Geeft de items een naam en een soort
-    def __init__(self, _name, _itemtype):
+    def __init__(self, _name, _itemtype, _damage):
         self.item_name = _name
         self.item_type = _itemtype
+        self.damage = _damage
         
 
 class Enemy:
@@ -311,18 +327,20 @@ class Enemy:
     def attack(self):
         #print("Ouch!")
         wapen = self.wapen()
-        if wapen == zwaard:
-            self.life -= 8
-        elif wapen == boog:
-            self.life -= 5
-        else:
+        #if wapen == zwaard:
+        if wapen == 0:
             self.life -= 3
+        else:
+            self.life -= wapen.damage
+        #elif wapen == boog:
+            #self.life -= 5
+        #else:
+            #self.life -= 3
         print('Monster heeft nog '+ str(self.life) + ' levens over.')
         schade_person = random.randint(0,self.max_schade)
         print('Het monster valt je aan hij haalt '+ str(schade_person) + ' levens van je af.')
         person.life -= schade_person
         print('Je hebt er nog '+ str(person.life) + ' over.')
-        enter()
         #print("Je valt het monster aan. Hij heeft nog " + str(self.life) + " levens over")
             
     def wapen(self):
@@ -383,14 +401,19 @@ def enter():
 #Hoogte en Breedte van de wereld
 hight = 4
 width = 4
+LEVENS_SPELER = 20
+LEVENS_MONSTER = 20
+LEVENS_VUURMONSTER = 25
+DAMAGE_MONSTER = 4
+DAMAGE_VUURMONSTER = 6
 
 #Maakt de Items
-appel = Item('Appel', 'eten')
-brood = Item('Brood', 'eten')
-zwaard = Item('Zwaard', 'wapen')
-boog = Item('Pijl en Boog', 'wapen')
-sleutel_goud = Item('Gouden Sleutel', 'sleutel')
-sleutel_zilver = Item('Zilvere Sleutel', 'sleutel')
+appel = Item('Appel', 'eten', 0)
+brood = Item('Brood', 'eten', 0)
+zwaard = Item('Zwaard', 'wapen', 6)
+boog = Item('Pijl en Boog', 'wapen', 8)
+sleutel_goud = Item('Gouden Sleutel', 'sleutel', 0)
+sleutel_zilver = Item('Zilvere Sleutel', 'sleutel', 0)
 
 #Maakt speler en start het spel
 person = Player()
