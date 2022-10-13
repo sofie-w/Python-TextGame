@@ -31,27 +31,27 @@ class Room:
     def add_exit(self):
         if self.x-1 >= 0:
             self.exits.append(self.world.world[self.x-1][self.y])
-            print('Voor(W): '+ self.exits[len(self.exits)-1].name)
+            print_header('Voor(W): '+ self.exits[len(self.exits)-1].name)
         else:
-            print("Voor(W): Muur")
+            print_header("Voor(W): Muur")
             self.exits.append("Muur")
         if self.y-1 >= 0:
             self.exits.append(self.world.world[self.x][self.y-1])
-            print('Links(A): '+ self.exits[len(self.exits)-1].name)
+            print_regel('Links(A): '+ self.exits[len(self.exits)-1].name)
         else:
-            print("Links(A): Muur")
+            print_regel("Links(A): Muur")
             self.exits.append("Muur")
         if self.x+1 <= hight-1:
             self.exits.append(self.world.world[self.x+1][self.y])
-            print('Achter(S): '+ self.exits[len(self.exits)-1].name)
+            print_regel('Achter(S): '+ self.exits[len(self.exits)-1].name)
         else:
-            print("Achter(S): Muur")
+            print_regel("Achter(S): Muur")
             self.exits.append("Muur")
         if self.y+1 <= width-1:
             self.exits.append(self.world.world[self.x][self.y+1])
-            print('Rechts(D): '+ self.exits[len(self.exits)-1].name + '\n')
+            print_footer('Rechts(D): '+ self.exits[len(self.exits)-1].name)
         else:
-            print("Rechts(D): Muur \n")
+            print_footer("Rechts(D): Muur")
             self.exits.append("Muur")
 
         
@@ -59,8 +59,9 @@ class Room:
     def describe(self):
         #print(len(self.items))
         if len(self.items) >= 1:
-            print('Je ziet in de ' + self.name + ' een '+ self.items[0].item_name + ' liggen. Maar er staat een ' + self.monster.name + ' voor.') # Maak grammatica correct bij alle kamers!
-            print(self.monster.life)
+            print_header('Je ziet in de ' + self.name + ' een '+ self.items[0].item_name + ' liggen.')# Maak grammatica correct bij alle kamers!
+            print_footer('Er staat een ' + self.monster.name + ' voor.') 
+            #print(self.monster.life)
             vraag = input('Wil je het '+ self.monster.name +' aanvallen(y/n): ')
             door = 'a'
             
@@ -76,13 +77,15 @@ class Room:
                             door = 'v'
                 if person.life <= 0:
                     
-                    print('Je bent dood')
+                    print_regel_los('Je bent dood')
+                    #print_footer_los()
                     #print(Controller.keuze)
                     #Controller.keuze = 'S'
                     return('S')
                 
                 elif self.monster.life <= 0:
-                    print('Je hebt het monster verslagen!')
+                    print_regel_los('Je hebt het monster verslagen!')
+                    #print_footer_los()
                     #enter()
                     vraag2 = input('Wil je een ' + self.items[0].item_name + ' meenemen(y/n): ')
                     if vraag2 == 'y':
@@ -95,10 +98,11 @@ class Room:
             else:
                 return(0)
         else:
-            print('Je bent nu in de ' + self.name + '. De kamer lijkt leeg. Wil je verder(V) gaan of nog even zoeken(Z)')
+            print_regel_los('Je bent nu in de ' + self.name + '. De kamer lijkt leeg. Wil je verder(V) gaan of nog even zoeken(Z)')
+            #print_footer()
             keuze = input('(V/Z): ')
             if keuze == 'Z':
-                print('De kamer is nog steeds leeg')
+                print_regel_los('De kamer is nog steeds leeg')
             return(0)
 
 
@@ -271,7 +275,7 @@ class Player: #Lopen en de inventory
         self.current_room = 'I'
         self.life = LEVENS_SPELER
         self.name =  input("Hoe heet je: ")
-        print("Hoi "+ self.name + '!')
+        print_header("Hoi "+ self.name + '!')
         
 
     def goto_room(self):
@@ -296,7 +300,7 @@ class Player: #Lopen en de inventory
                 #self.kijken_lopen()
                 door = 'nee'
             else:
-                print("Je hebt een verkeerde weg gekozen of iets verkeerds ingevuld. \nProbeer het opnieuw.")
+                print_regel_los("Je hebt een verkeerde weg gekozen of iets verkeerds ingevuld. \nProbeer het opnieuw.")
             
 
     def set_current_room(self, room):
@@ -320,16 +324,16 @@ class Player: #Lopen en de inventory
         self.inventory.append(item)
 
     def print_inv(self):
-        print('Appels: '+ str(self.inventory.count(appel)))
-        print('Brood: '+ str(self.inventory.count(brood)))
-        print('Zwaarden: '+ str(self.inventory.count(zwaard)))
-        print('Pijl en Boog: '+ str(self.inventory.count(boog)))
-        print('Zilvere sleutels: '+ str(self.inventory.count(sleutel_zilver)))
-        print('Goude sleutels: '+ str(self.inventory.count(sleutel_goud)))
+        print_header('Appels: '+ str(self.inventory.count(appel)))
+        print_regel('Brood: '+ str(self.inventory.count(brood)))
+        print_regel('Zwaarden: '+ str(self.inventory.count(zwaard)))
+        print_regel('Pijl en Boog: '+ str(self.inventory.count(boog)))
+        print_regel('Zilvere sleutels: '+ str(self.inventory.count(sleutel_zilver)))
+        print_footer('Goude sleutels: '+ str(self.inventory.count(sleutel_goud)))
         enter()
         
     def print_life(self):
-        print('Je hebt nog ' + str(self.life) + ' levens!')
+        print_regel_los('Je hebt nog ' + str(self.life) + ' levens!')
         enter()
 
 
@@ -343,10 +347,11 @@ class Controller: # Begint het spel en laat het menu zien
         mana.create_world()
         while self.keuze != 'S':
             clear_screen()
-            print(self.keuze)
-            print('Je bent nu in de ' + person.current_room.name)
-            print('\nLopen: L \nInventory bekijken: I \nKamer bekijken: K \nHonger bekijken: H \nStoppen: S')
-            self.keuze = input("Kies(L/I/K/H/S): ")
+            #print(self.keuze)
+            print_menu()
+            #print('Je bent nu in de ' + person.current_room.name)
+            #print('\nLopen: L \nInventory bekijken: I \nKamer bekijken: K \nHonger bekijken: H \nStoppen: S')
+            self.keuze = input("Kies(K/L/I/E/S): ")
             clear_screen()
             if self.keuze == 'L':
                 person.goto_room()
@@ -355,16 +360,16 @@ class Controller: # Begint het spel en laat het menu zien
                 person.print_inv()
             elif self.keuze == 'K':
                 self.keuze = person.kijken()
-            elif self.keuze == 'H':
+            elif self.keuze == 'E':
                 person.print_life()
             elif self.keuze == 'S':
-                print('Doei doei')
+                print_regel_los('Doei doei')
             else:
-                print('Je hebt iets verkeerd getypt, probeer het opnieuw.')
+                print_regel_los('Je hebt iets verkeerd getypt, probeer het opnieuw.')
             
             if person.inventory.count(sleutel_goud) == 3: #Als je 3 sleutels hebt dan win je
                 self.keuze = 'S'
-                print("Je hebt de goude sleutel gevonden! Je hebt gewonnen")
+                print_regel_los("Je hebt de goude sleutel gevonden! Je hebt gewonnen")
                     
 
 
@@ -388,10 +393,10 @@ class Enemy:
         self.attacked()
         
         schade_person = random.randint(0,self.max_schade)
-        print('Het monster valt je aan hij haalt '+ str(schade_person) + ' levens van je af.')
+        print_regel('Het monster valt je aan hij haalt '+ str(schade_person) + ' levens van je af.')
         person.life -= schade_person
         #self.attacked()
-        print('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
+        print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
         #print('Je hebt er nog '+ str(person.life) + ' over.')
         #print("Je valt het monster aan. Hij heeft nog " + str(self.life) + " levens over")
         
@@ -400,8 +405,10 @@ class Enemy:
         #if wapen == zwaard:
         if wapen == 0:
             self.life -= 3
+            print_header('Je valt het monster aan met je handen, je haalt 3 van zijn levens er af!')
         else:
             self.life -= wapen.damage
+            print_header('Je valt het monster aan met je handen, je haalt' + str(wapen.damage) + 'van zijn levens er af!')
         
             
     def wapen(self):
@@ -498,7 +505,38 @@ class Enemy_Plant(Enemy):
         
         else:
             Enemy.attack(self)
+            
+def print_footer(zin):
+    print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(zin))
+    print("="*(SCHERMBREEDTE))
+    
+def print_footer_los():
+    print("="*(SCHERMBREEDTE))
+    
+def print_header(zin):
+    print("="*(SCHERMBREEDTE))
+    print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(zin))
 
+  
+def print_menu():
+    print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+    print_regel("Huidige locatie: " + person.current_room.name)
+    #print_regel("Je gebruikt nu de woordenlijst: " + woordenlijst)
+    print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+    print_regel("Kamer bekijken -- K")
+    print_regel("Lopen -- L")
+    print_regel("Inventory bekijken -- I")
+    print_regel("Levens bekijken -- E")
+    print_regel("Stoppen -- S")
+    print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+    
+def print_regel(regel):
+    print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(regel))
+
+def print_regel_los(regel):
+    print("="*(SCHERMBREEDTE))
+    print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(regel))
+    print("="*(SCHERMBREEDTE))
 
 
 def clear_screen(): #Maakt het scherm leeg
@@ -517,6 +555,10 @@ LEVENS_MONSTER = 10
 LEVENS_VUURMONSTER = 15
 DAMAGE_MONSTER = 4
 DAMAGE_VUURMONSTER = 6
+SCHERMBREEDTE = 80
+HELFT_SCHERMBREEDTE = SCHERMBREEDTE/2
+MAX_WOORD_LENGTE = 20
+
 MONSTERS = [Enemy_Plant(), Enemy_Water(), Enemy_Fire(), Enemy()]
 
 #Maakt de Items
