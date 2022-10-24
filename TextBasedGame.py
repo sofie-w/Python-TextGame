@@ -10,8 +10,15 @@ class Room:
         self.x = 0
         self.y = 0
         self.add_item(_item)
+        self.locked = self.locked_Room()
         self.monster = _monster
         print(self.monster)
+        
+    def locked_Room(self):
+        if random.randint(0, 15) == 3:
+            return True
+        else:
+            return True
         
     def add_item(self, item):
         self.items.append(item)
@@ -57,10 +64,24 @@ class Room:
         
     
     def describe(self):
-        #print(len(self.items))
-        if len(self.items) >= 1:
+        if self.locked == True:
+            print_header('De deur zit op slot je hebt een zilvere sleutel nodig om hem te openen.')
+            if sleutel_zilver in person.inventory:
+                print_footer_los()
+                door = input('Wil je de zilvere sleutel gebruiken(y/n): ')
+                if door == 'y':
+                    self.locked = False
+                    print_regel('De kamer is open!')
+                    enter()
+            else:
+                print_footer('Je hebt geen zilvere sleutels, vindt er eentje!')
+                enter()
+                    
+        if len(self.items) >= 1 and self.locked == False:
             print_header('Je ziet in de ' + self.name + ' een '+ self.items[0].item_name + ' liggen.')# Maak grammatica correct bij alle kamers!
-            print_footer('Er staat een ' + self.monster.name + ' voor.') 
+            print_regel('Er staat een ' + self.monster.name + ' voor.')
+            print_regel('')
+            print_footer('Monster: '+ str(self.monster.life) + ' - Jij: ' + str(person.life))
             #print(self.monster.life)
             vraag = input('Wil je het '+ self.monster.name +' aanvallen(y/n): ')
             door = 'a'
@@ -97,13 +118,15 @@ class Room:
 
             else:
                 return(0)
-        else:
+        elif len(self.items) <= 0:
             print_regel_los('Je bent nu in de ' + self.name + '. De kamer lijkt leeg. Wil je verder(V) gaan of nog even zoeken(Z)')
             #print_footer()
             keuze = input('(V/Z): ')
             if keuze == 'Z':
                 print_regel_los('De kamer is nog steeds leeg')
             return(0)
+            
+            
 
 
 
@@ -271,7 +294,7 @@ class World: #Maakt een random wereld
 
 class Player: #Lopen en de inventory
     def __init__(self):
-        self.inventory = []
+        self.inventory = [sleutel_zilver]
         self.current_room = 'I'
         self.life = LEVENS_SPELER
         self.name =  input("Hoe heet je: ")
@@ -393,7 +416,7 @@ class Enemy:
         self.attacked()
         
         schade_person = random.randint(0,self.max_schade)
-        print_regel('Het monster valt je aan hij haalt '+ str(schade_person) + ' levens van je af.')
+        print_regel('Jij: -' + str(schade_person))
         person.life -= schade_person
         #self.attacked()
         print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
@@ -405,10 +428,10 @@ class Enemy:
         #if wapen == zwaard:
         if wapen == 0:
             self.life -= 3
-            print_header('Je valt het monster aan met je handen, je haalt 3 van zijn levens er af!')
+            print_header('Monster: -3')
         else:
             self.life -= wapen.damage
-            print_header('Je valt het monster aan met je handen, je haalt' + str(wapen.damage) + 'van zijn levens er af!')
+            print_header('Monster: -' + str(wapen.damage))
         
             
     def wapen(self):
@@ -464,7 +487,8 @@ class Enemy_Fire(Enemy):
             #schade_person = 6
             person.life -= 6
             Enemy.attacked(self)
-            print('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
+            print_regel('Jij: -6')
+            print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
         
         else:
             Enemy.attack(self)
@@ -483,7 +507,8 @@ class Enemy_Water(Enemy):
             #schade_person = 6
             person.life -= 6
             Enemy.attacked(self)
-            print('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
+            print_regel('Jij: -6')
+            print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
         
         else:
             Enemy.attack(self)
@@ -501,7 +526,8 @@ class Enemy_Plant(Enemy):
             #schade_person = 6
             person.life -= 6
             Enemy.attacked(self)
-            print('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
+            print_regel('Jij: -6')
+            print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
         
         else:
             Enemy.attack(self)
