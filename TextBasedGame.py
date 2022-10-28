@@ -18,7 +18,7 @@ class Room:
         if random.randint(0, 15) == 3:
             return True
         else:
-            return True
+            return False
         
     def add_item(self, item):
         self.items.append(item)
@@ -289,12 +289,19 @@ class World: #Maakt een random wereld
 
         firstroom = self.world[x][y]
         person.set_current_room(firstroom)
-
-
+        
+    def print_world(self):
+        
+        
+    def print_world_rand(self):
+        
+    def print_world_leeg(self):
+        
+    def print_world_kamer(self):
 
 class Player: #Lopen en de inventory
     def __init__(self):
-        self.inventory = [sleutel_zilver]
+        self.inventory = []
         self.current_room = 'I'
         self.life = LEVENS_SPELER
         self.name =  input("Hoe heet je: ")
@@ -358,6 +365,33 @@ class Player: #Lopen en de inventory
     def print_life(self):
         print_regel_los('Je hebt nog ' + str(self.life) + ' levens!')
         enter()
+    
+    def eten(self):
+        print_header('Je hebt nu ' + str(person.life) + ' levens.')
+        print_regel('Appels: '+ str(self.inventory.count(appel)) + '  ---  +5 levens')
+        print_footer('Brood: '+ str(self.inventory.count(brood)) + '   ---  +7 levens')
+        keuze = input('Wil je een appel(A) of brood(B) eten: ')
+        if keuze == 'A':
+            if self.inventory.count(appel) > 0:
+                self.inventory.remove(appel)
+                self.life = self.life + 5
+                print_regel_los('Je hebt nu ' + str(person.life) + ' levens.')
+                enter()
+            else:
+                clear_screen()
+                print_regel_los('Je hebt geen appels.')
+                enter()
+        elif keuze == 'B':
+            if self.inventory.count(brood) > 0:
+                self.inventory.remove(brood)
+                self.life = self.life + 7
+                print_regel_los('Je hebt nu ' + str(person.life) + ' levens.')
+                enter()
+            else:
+                clear_screen()
+                print_regel_los('Je hebt geen brood')
+        
+        
 
 
 
@@ -374,7 +408,7 @@ class Controller: # Begint het spel en laat het menu zien
             print_menu()
             #print('Je bent nu in de ' + person.current_room.name)
             #print('\nLopen: L \nInventory bekijken: I \nKamer bekijken: K \nHonger bekijken: H \nStoppen: S')
-            self.keuze = input("Kies(K/L/I/E/S): ")
+            self.keuze = input("Kies(K/L/I/B/E/S): ")
             clear_screen()
             if self.keuze == 'L':
                 person.goto_room()
@@ -383,8 +417,10 @@ class Controller: # Begint het spel en laat het menu zien
                 person.print_inv()
             elif self.keuze == 'K':
                 self.keuze = person.kijken()
-            elif self.keuze == 'E':
+            elif self.keuze == 'B':
                 person.print_life()
+            elif self.keuze == 'E':
+                person.eten()
             elif self.keuze == 'S':
                 print_regel_los('Doei doei')
             else:
@@ -552,7 +588,8 @@ def print_menu():
     print_regel("Kamer bekijken -- K")
     print_regel("Lopen -- L")
     print_regel("Inventory bekijken -- I")
-    print_regel("Levens bekijken -- E")
+    print_regel("Levens bekijken -- B")
+    print_regel("Eten -- E")
     print_regel("Stoppen -- S")
     print("+" + "-"*(SCHERMBREEDTE-2) + "+")
     
@@ -576,7 +613,7 @@ def enter():
 #Hoogte en Breedte van de wereld
 hight = 4
 width = 4
-LEVENS_SPELER = 20
+LEVENS_SPELER = 50
 LEVENS_MONSTER = 10
 LEVENS_VUURMONSTER = 15
 DAMAGE_MONSTER = 4
