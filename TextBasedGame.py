@@ -1,7 +1,7 @@
 import random
 
 class Room:
-    def __init__(self, _room_name, _world, _item, _monster):
+    def __init__(self, _room_name, _world, _item = 'None', _monster = 'None'):
         self.exits = []
         self.items = []
         #self.items.append(_item)
@@ -36,30 +36,31 @@ class Room:
         #print(self.monster)
 
     def add_exit(self):
+        #print(self.y)
+        
+        print(self.name)
         if self.x-1 >= 0:
             self.exits.append(self.world.world[self.x-1][self.y])
-            print_header('Voor(W): '+ self.exits[len(self.exits)-1].name)
+            #print(self.world.world[self.x-1][self.y])
         else:
-            print_header("Voor(W): Muur")
-            self.exits.append("Muur")
+            self.exits.append(self.world.muur)
         if self.y-1 >= 0:
+            #print(self.y)
             self.exits.append(self.world.world[self.x][self.y-1])
-            print_regel('Links(A): '+ self.exits[len(self.exits)-1].name)
+            #print(self.world.world[self.x][self.y-1])
         else:
-            print_regel("Links(A): Muur")
-            self.exits.append("Muur")
+            self.exits.append(self.world.muur)
         if self.x+1 <= hight-1:
             self.exits.append(self.world.world[self.x+1][self.y])
-            print_regel('Achter(S): '+ self.exits[len(self.exits)-1].name)
+            #print(self.world.world[self.x+1][self.y])
         else:
-            print_regel("Achter(S): Muur")
-            self.exits.append("Muur")
+            self.exits.append(self.world.muur)
         if self.y+1 <= width-1:
+            #print(self.y)
             self.exits.append(self.world.world[self.x][self.y+1])
-            print_footer('Rechts(D): '+ self.exits[len(self.exits)-1].name)
+            #print(self.world.world[self.x][self.y+1])
         else:
-            print_footer("Rechts(D): Muur")
-            self.exits.append("Muur")
+            self.exits.append(self.world.muur)
 
         
     
@@ -141,6 +142,7 @@ class World: #Maakt een random wereld
         self.poss_items = []
         self.poss_Enemy = []
         self.rooms = []
+        self.muur = Room('muur', self)
 
     def create_world(self):
         
@@ -239,6 +241,8 @@ class World: #Maakt een random wereld
         item = self.random_item()
         monster = self.random_enemy()
         zolder = Room('zolder', self, item, monster) #!
+        #monster = self.random_enemy()
+        
         
         self.add_room(keuken)
         self.add_room(woonkamer)
@@ -264,7 +268,13 @@ class World: #Maakt een random wereld
                 self.world[i][j] = room
                 room.x = i
                 room.y = j
+                #room.add_exit()
                 self.rooms.remove(room)
+                
+        for i in range(hight):
+            for j in range(width):
+                self.world[i][j].add_exit()
+                
 
         self.first_room()
         
@@ -290,14 +300,6 @@ class World: #Maakt een random wereld
         firstroom = self.world[x][y]
         person.set_current_room(firstroom)
         
-    def print_world(self):
-        
-        
-    def print_world_rand(self):
-        
-    def print_world_leeg(self):
-        
-    def print_world_kamer(self):
 
 class Player: #Lopen en de inventory
     def __init__(self):
@@ -309,7 +311,8 @@ class Player: #Lopen en de inventory
         
 
     def goto_room(self):
-        self.current_room.add_exit()
+        print_world_rand()
+        
         door = 'ja'
         while door == 'ja':
             lopen = input("Waar wil je heen(W/A/S/D): ")
@@ -600,6 +603,16 @@ def print_regel_los(regel):
     print("="*(SCHERMBREEDTE))
     print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(regel))
     print("="*(SCHERMBREEDTE))
+    
+def print_world_rand():
+    print(16*' ' + '+' + 15*'-' + '+')
+    print((16*' ' + "|{:^" + str(15)+ "}|").format(person.current_room.exits[0].name))
+    #print(16*' ' + '+' + 15*'-' + '+')
+    print('+' + 15*'-' + '+' + 7*'-' + '^' + 7*'-' + '+' + 15*'-' + '+')
+    print( ("|{:^" + str(15)+ "}<{:^" + str(15)+ "}>{:^" + str(15)+ "}|").format(person.current_room.exits[1].name, person.current_room.name, person.current_room.exits[3].name)  )
+    print('+' + 15*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
+    print((16*' ' + "|{:^" + str(15)+ "}|").format(person.current_room.exits[2].name))
+    print(16*' ' + '+' + 15*'-' + '+')
 
 
 def clear_screen(): #Maakt het scherm leeg
