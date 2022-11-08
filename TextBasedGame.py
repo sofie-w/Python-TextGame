@@ -4,7 +4,6 @@ class Room:
     def __init__(self, _room_name, _world, _item = 'None', _monster = 'None'):
         self.exits = []
         self.items = []
-        #self.items.append(_item)
         self.world = _world
         self.name = _room_name
         self.x = 0
@@ -12,7 +11,6 @@ class Room:
         self.add_item(_item)
         self.locked = self.locked_Room()
         self.monster = _monster
-        print(self.monster)
         
     def locked_Room(self):
         if random.randint(0, 15) == 3:
@@ -24,41 +22,25 @@ class Room:
         self.items.append(item)
         
     def add_Enemy(self):
-        #kies = random.randint(0, 1)
         monster = random.choice(MONSTERS)
         return(monster)
-        #if kies == 0:
-         #   return(Enemy())
-            #self.monster = Enemy()
-        #else:
-         #   return(Enemy_Fire())
-            #self.monster = Enemy_Fire()
-        #print(self.monster)
 
     def add_exit(self):
-        #print(self.y)
-        
-        print(self.name)
+
         if self.x-1 >= 0:
             self.exits.append(self.world.world[self.x-1][self.y])
-            #print(self.world.world[self.x-1][self.y])
         else:
             self.exits.append(self.world.muur)
         if self.y-1 >= 0:
-            #print(self.y)
             self.exits.append(self.world.world[self.x][self.y-1])
-            #print(self.world.world[self.x][self.y-1])
         else:
             self.exits.append(self.world.muur)
         if self.x+1 <= hight-1:
             self.exits.append(self.world.world[self.x+1][self.y])
-            #print(self.world.world[self.x+1][self.y])
         else:
             self.exits.append(self.world.muur)
         if self.y+1 <= width-1:
-            #print(self.y)
             self.exits.append(self.world.world[self.x][self.y+1])
-            #print(self.world.world[self.x][self.y+1])
         else:
             self.exits.append(self.world.muur)
 
@@ -83,7 +65,6 @@ class Room:
             print_regel('Er staat een ' + self.monster.name + ' voor.')
             print_regel('')
             print_footer('Monster: '+ str(self.monster.life) + ' - Jij: ' + str(person.life))
-            #print(self.monster.life)
             vraag = input('Wil je het '+ self.monster.name +' aanvallen(y/n): ')
             door = 'a'
             
@@ -94,21 +75,16 @@ class Room:
                         vraag = input('Wil je verder met aanvallen(a) of wil je vluchten(v) (a/v): ')
                         if vraag == 'a':
                             clear_screen()
-                            #return(0)
                         elif vraag == 'v':
                             door = 'v'
                 if person.life <= 0:
                     
                     print_regel_los('Je bent dood')
-                    #print_footer_los()
-                    #print(Controller.keuze)
-                    #Controller.keuze = 'S'
                     return('S')
                 
                 elif self.monster.life <= 0:
-                    print_regel_los('Je hebt het monster verslagen!')
-                    #print_footer_los()
-                    #enter()
+                    print_regel_los('Je hebt het monster verslagen! Je hebt ' + str(self.monster.waarde) + ' coins verdiend.')
+                    person.geld += self.monster.waarde
                     vraag2 = input('Wil je een ' + self.items[0].item_name + ' meenemen(y/n): ')
                     if vraag2 == 'y':
                         item = self.items[0]
@@ -121,7 +97,6 @@ class Room:
                 return(0)
         elif len(self.items) <= 0:
             print_regel_los('Je bent nu in de ' + self.name + '. De kamer lijkt leeg. Wil je verder(V) gaan of nog even zoeken(Z)')
-            #print_footer()
             keuze = input('(V/Z): ')
             if keuze == 'Z':
                 print_regel_los('De kamer is nog steeds leeg')
@@ -241,7 +216,6 @@ class World: #Maakt een random wereld
         item = self.random_item()
         monster = self.random_enemy()
         zolder = Room('zolder', self, item, monster) #!
-        #monster = self.random_enemy()
         
         
         self.add_room(keuken)
@@ -268,7 +242,6 @@ class World: #Maakt een random wereld
                 self.world[i][j] = room
                 room.x = i
                 room.y = j
-                #room.add_exit()
                 self.rooms.remove(room)
                 
         for i in range(hight):
@@ -306,34 +279,50 @@ class Player: #Lopen en de inventory
         self.inventory = []
         self.current_room = 'I'
         self.life = LEVENS_SPELER
-        self.name =  input("Hoe heet je: ")
-        print_header("Hoi "+ self.name + '!')
+        self.geld = 0
+        #self.name =  input("Hoe heet je: ")
+        #print_header("Hoi "+ self.name + '!')
         
 
     def goto_room(self):
-        print_world_rand()
-        
         door = 'ja'
         while door == 'ja':
+            print_world_rand()
             lopen = input("Waar wil je heen(W/A/S/D): ")
-            if lopen == 'W' and self.current_room.exits[0] != 'Muur':
-                self.set_current_room(self.current_room.exits[0])
-                #self.kijken_lopen()
-                door = 'nee'
-            elif lopen == 'A' and self.current_room.exits[1] != 'Muur':
-                self.set_current_room(self.current_room.exits[1])
-                #self.kijken_lopen()
-                door = 'nee'
-            elif lopen == 'S' and self.current_room.exits[2] != 'Muur':
-                self.set_current_room(self.current_room.exits[2])
-                #self.kijken_lopen()
-                door = 'nee'
-            elif lopen == 'D' and self.current_room.exits[3] != 'Muur':
-                self.set_current_room(self.current_room.exits[3])
-                #self.kijken_lopen()
-                door = 'nee'
+            if lopen == 'W' or lopen == 'w':
+                if self.current_room.exits[0].name != 'muur':
+                    self.set_current_room(self.current_room.exits[0])
+                    door = 'nee'
+                else:
+                    clear_screen()
+                    print_regel_los("Er zit een muur...")
+                
+            elif lopen == 'A' or lopen == 'a':
+                if self.current_room.exits[1].name != 'muur':
+                    self.set_current_room(self.current_room.exits[1])
+                    door = 'nee'
+                else:
+                    clear_screen()
+                    print_regel_los("Er zit een muur...")
+                    
+            elif lopen == 'S' or lopen == 's':
+                if self.current_room.exits[2].name != 'muur':
+                    self.set_current_room(self.current_room.exits[2])
+                    door = 'nee'
+                else:
+                    clear_screen()
+                    print_regel_los("Er zit een muur...")
+            
+            elif lopen == 'D' or lopen == 'd':
+                if self.current_room.exits[3].name != 'muur':
+                    self.set_current_room(self.current_room.exits[3])
+                    door = 'nee'
+                else:
+                    clear_screen()
+                    print_regel_los("Er zit een muur...")
             else:
-                print_regel_los("Je hebt een verkeerde weg gekozen of iets verkeerds ingevuld. \nProbeer het opnieuw.")
+                clear_screen()
+                print_regel_los("Je hebt iets verkeerds ingevuld. Probeer het opnieuw.")
             
 
     def set_current_room(self, room):
@@ -357,6 +346,7 @@ class Player: #Lopen en de inventory
         self.inventory.append(item)
 
     def print_inv(self):
+        print_header('Coins: '+ str(self.geld))
         print_header('Appels: '+ str(self.inventory.count(appel)))
         print_regel('Brood: '+ str(self.inventory.count(brood)))
         print_regel('Zwaarden: '+ str(self.inventory.count(zwaard)))
@@ -365,9 +355,6 @@ class Player: #Lopen en de inventory
         print_footer('Goude sleutels: '+ str(self.inventory.count(sleutel_goud)))
         enter()
         
-    def print_life(self):
-        print_regel_los('Je hebt nog ' + str(self.life) + ' levens!')
-        enter()
     
     def eten(self):
         print_header('Je hebt nu ' + str(person.life) + ' levens.')
@@ -407,24 +394,19 @@ class Controller: # Begint het spel en laat het menu zien
         mana.create_world()
         while self.keuze != 'S':
             clear_screen()
-            #print(self.keuze)
             print_menu()
-            #print('Je bent nu in de ' + person.current_room.name)
-            #print('\nLopen: L \nInventory bekijken: I \nKamer bekijken: K \nHonger bekijken: H \nStoppen: S')
-            self.keuze = input("Kies(K/L/I/B/E/S): ")
+            self.keuze = input("Kies(K/L/I/E/S): ")
             clear_screen()
-            if self.keuze == 'L':
+            if self.keuze == 'L' or self.keuze == 'l':
                 person.goto_room()
                 print('')
-            elif self.keuze == 'I':
+            elif self.keuze == 'I' or self.keuze == 'i':
                 person.print_inv()
-            elif self.keuze == 'K':
+            elif self.keuze == 'K' or self.keuze == 'k':
                 self.keuze = person.kijken()
-            elif self.keuze == 'B':
-                person.print_life()
-            elif self.keuze == 'E':
+            elif self.keuze == 'E' or self.keuze == 'e':
                 person.eten()
-            elif self.keuze == 'S':
+            elif self.keuze == 'S' or self.keuze == 's':
                 print_regel_los('Doei doei')
             else:
                 print_regel_los('Je hebt iets verkeerd getypt, probeer het opnieuw.')
@@ -448,23 +430,19 @@ class Enemy:
     def __init__(self):
         self.life = LEVENS_MONSTER
         self.max_schade = DAMAGE_MONSTER
+        self.waarde = WAARDE_MONSTER
         self.name = 'Monster'
 
     def attack(self):
-        #print("Ouch!")
         self.attacked()
         
         schade_person = random.randint(0,self.max_schade)
         print_regel('Jij: -' + str(schade_person))
         person.life -= schade_person
-        #self.attacked()
         print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
-        #print('Je hebt er nog '+ str(person.life) + ' over.')
-        #print("Je valt het monster aan. Hij heeft nog " + str(self.life) + " levens over")
         
     def attacked(self):
         wapen = self.wapen()
-        #if wapen == zwaard:
         if wapen == 0:
             self.life -= 3
             print_header('Monster: -3')
@@ -516,14 +494,14 @@ class Enemy:
 class Enemy_Fire(Enemy):
     def __init__(self):
         Enemy.__init__(self)
-        self.life = LEVENS_VUURMONSTER
-        self.max_schade = DAMAGE_VUURMONSTER
+        self.life = LEVENS_SPECIAALMONSTER
+        self.max_schade = DAMAGE_SPECIAALMONSTER
+        self.waarde = WAARDE_SPECIAALMONSTER
         self.name = 'Vuur Monster'
         
     def attack(self):
         if random.randint(0, 3) == 1:
             print('Het monster spuwt vuur naar je toe, het kost je 6 levens.')
-            #schade_person = 6
             person.life -= 6
             Enemy.attacked(self)
             print_regel('Jij: -6')
@@ -534,16 +512,15 @@ class Enemy_Fire(Enemy):
             
 class Enemy_Water(Enemy):
     def __init__(self):
-        #super.__init__
         Enemy.__init__(self)
-        self.life = LEVENS_VUURMONSTER
-        self.max_schade = DAMAGE_VUURMONSTER
+        self.life = LEVENS_SPECIAALMONSTER
+        self.max_schade = DAMAGE_SPECIAALMONSTER
+        self.waarde = WAARDE_SPECIAALMONSTER
         self.name = 'Water Monster'
         
     def attack(self):
         if random.randint(0, 3) == 1:
             print('Het monster maakt een waterkolk om je heen dit kost je 6 levens.')
-            #schade_person = 6
             person.life -= 6
             Enemy.attacked(self)
             print_regel('Jij: -6')
@@ -555,19 +532,18 @@ class Enemy_Water(Enemy):
 class Enemy_Plant(Enemy):
     def __init__(self):
         Enemy.__init__(self)
-        self.life = LEVENS_VUURMONSTER
-        self.max_schade = DAMAGE_VUURMONSTER
+        self.life = LEVENS_SPECIAALMONSTER
+        self.max_schade = DAMAGE_SPECIAALMONSTER
+        self.waarde = WAARDE_SPECIAALMONSTER
         self.name = 'Plant Monster'
         
     def attack(self):
         if random.randint(0, 3) == 1:
             print('Het monster geeft je een klap met een tak dit kost je 6 levens.')
-            #schade_person = 6
             person.life -= 6
             Enemy.attacked(self)
             print_regel('Jij: -6')
             print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
-        
         else:
             Enemy.attack(self)
             
@@ -585,13 +561,11 @@ def print_header(zin):
   
 def print_menu():
     print("+" + "-"*(SCHERMBREEDTE-2) + "+")
-    print_regel("Huidige locatie: " + person.current_room.name)
-    #print_regel("Je gebruikt nu de woordenlijst: " + woordenlijst)
+    print_regel_dubbel("Huidige locatie: " + person.current_room.name, "Levens: " + str(person.life))     , 
     print("+" + "-"*(SCHERMBREEDTE-2) + "+")
     print_regel("Kamer bekijken -- K")
     print_regel("Lopen -- L")
     print_regel("Inventory bekijken -- I")
-    print_regel("Levens bekijken -- B")
     print_regel("Eten -- E")
     print_regel("Stoppen -- S")
     print("+" + "-"*(SCHERMBREEDTE-2) + "+")
@@ -604,15 +578,17 @@ def print_regel_los(regel):
     print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(regel))
     print("="*(SCHERMBREEDTE))
     
+def print_regel_dubbel(zin1, zin2):
+    print(("| {:"+ str(int((SCHERMBREEDTE/2))-2) +"}{:^"+ str(int((SCHERMBREEDTE/2))-1) +"}|").format(zin1, zin2))
+    
 def print_world_rand():
     print(16*' ' + '+' + 15*'-' + '+')
     print((16*' ' + "|{:^" + str(15)+ "}|").format(person.current_room.exits[0].name))
-    #print(16*' ' + '+' + 15*'-' + '+')
-    print('+' + 15*'-' + '+' + 7*'-' + '^' + 7*'-' + '+' + 15*'-' + '+')
-    print( ("|{:^" + str(15)+ "}<{:^" + str(15)+ "}>{:^" + str(15)+ "}|").format(person.current_room.exits[1].name, person.current_room.name, person.current_room.exits[3].name)  )
-    print('+' + 15*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
+    print('+' + 15*'-' + '+' + 6*'-' + ' ↑ ' + 6*'-' + '+' + 15*'-' + '+')
+    print( ("|{:^" + str(15)+ "}←{:^" + str(15)+ "}→{:^" + str(15)+ "}|").format(person.current_room.exits[1].name, person.current_room.name, person.current_room.exits[3].name)  )
+    print('+' + 15*'-' + '+' + 6*'-' + ' ↓ ' + 6*'-' + '+' + 15*'-' + '+')
     print((16*' ' + "|{:^" + str(15)+ "}|").format(person.current_room.exits[2].name))
-    print(16*' ' + '+' + 15*'-' + '+')
+    print(16*' ' + '+' + 15*'-' + '+\n')
 
 
 def clear_screen(): #Maakt het scherm leeg
@@ -628,9 +604,11 @@ hight = 4
 width = 4
 LEVENS_SPELER = 50
 LEVENS_MONSTER = 10
-LEVENS_VUURMONSTER = 15
+LEVENS_SPECIAALMONSTER = 15
 DAMAGE_MONSTER = 4
-DAMAGE_VUURMONSTER = 6
+DAMAGE_SPECIAALMONSTER = 6
+WAARDE_MONSTER = 5
+WAARDE_SPECIAALMONSTER = 10
 SCHERMBREEDTE = 80
 HELFT_SCHERMBREEDTE = SCHERMBREEDTE/2
 MAX_WOORD_LENGTE = 20
@@ -649,12 +627,3 @@ sleutel_zilver = Item('Zilvere Sleutel', 'sleutel', 0)
 person = Player()
 speel = Controller()
 speel.play_game()
-
-
-
-#Ideeën
-# - Meerdere Enemys verschilende krachten -
-#		Normaal, Vuur, Water, Plant
-# - Levens Potion
-# - 
-
