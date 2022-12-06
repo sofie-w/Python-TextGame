@@ -279,7 +279,7 @@ class Player: #Lopen en de inventory
         self.inventory = []
         self.current_room = 'I'
         self.life = LEVENS_SPELER
-        self.geld = 0
+        self.geld = 30
         #self.name =  input("Hoe heet je: ")
         #print_header("Hoi "+ self.name + '!')
         
@@ -346,43 +346,65 @@ class Player: #Lopen en de inventory
         self.inventory.append(item)
 
     def print_inv(self):
-        print_header('Coins: '+ str(self.geld))
-        print_header('Appels: '+ str(self.inventory.count(appel)))
-        print_regel('Brood: '+ str(self.inventory.count(brood)))
-        print_regel('Zwaarden: '+ str(self.inventory.count(zwaard)))
-        print_regel('Pijl en Boog: '+ str(self.inventory.count(boog)))
-        print_regel('Zilvere sleutels: '+ str(self.inventory.count(sleutel_zilver)))
-        print_footer('Goude sleutels: '+ str(self.inventory.count(sleutel_goud)))
+        print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+        print_regel_inv('Eten', 'Aantal', 'Wapens', 'Aantal')
+        print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+        for i in range(int(len(spullen)/2)):
+            print_regel_inv(spullen[i].item_name, str(self.inventory.count(spullen[i])), spullen[i+5].item_name, str(self.inventory.count(spullen[i+5])))
+        print("+" + "-"*(SCHERMBREEDTE-2) + "+")
         enter()
         
     
     def eten(self):
         print_header('Je hebt nu ' + str(person.life) + ' levens.')
-        print_regel('Appels: '+ str(self.inventory.count(appel)) + '  ---  +5 levens')
-        print_footer('Brood: '+ str(self.inventory.count(brood)) + '   ---  +7 levens')
-        keuze = input('Wil je een appel(A) of brood(B) eten: ')
-        if keuze == 'A':
-            if self.inventory.count(appel) > 0:
-                self.inventory.remove(appel)
-                self.life = self.life + 5
-                print_regel_los('Je hebt nu ' + str(person.life) + ' levens.')
-                enter()
-            else:
-                clear_screen()
-                print_regel_los('Je hebt geen appels.')
-                enter()
-        elif keuze == 'B':
-            if self.inventory.count(brood) > 0:
-                self.inventory.remove(brood)
-                self.life = self.life + 7
-                print_regel_los('Je hebt nu ' + str(person.life) + ' levens.')
-                enter()
-            else:
-                clear_screen()
-                print_regel_los('Je hebt geen brood')
+        print_regel_inv('Eten', 'Aantal', 'Levens', 'Letter')
+        for i in range(int(len(spullen)/2)):
+            print_regel_inv(spullen[i].item_name, str(self.inventory.count(spullen[i])), str(spullen[i].damage_levens) + ' levens', spullen[i].letter)
+        print_footer_los()
         
-        
+        keuze = input('Wat wil je eten: ')
+        for i in range(int(len(spullen)/2)):
+            if keuze == spullen[i].letter:
+                if self.inventory.count(spullen[i]) > 0:
+                    self.inventory.remove(spullen[i])
+                    self.life = self.life + spullen[i].damage_levens
+                else:
+                    clear_screen()
+                    print_regel_los('Je hebt geen ' + spullen[i].item_name.lower() + '.')
+                    enter()
 
+        
+class Winkel:      
+    def laten_zien(self):
+        print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+        print_regel_winkel("Wat", "Letter", "Prijs")
+        print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+        appel.print_kopen()
+        brood.print_kopen()
+        taart.print_kopen()
+        soep.print_kopen()
+        ijs.print_kopen()
+        print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+        zwaard.print_kopen()
+        boog.print_kopen()
+        mes.print_kopen()
+        knuppel.print_kopen()
+        print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+        keuze = input("Jouw geld: " + str(person.geld) + " \nWat wil je kopen: ")
+        for i in range(len(spullen)):
+            if spullen[i].letter == keuze:
+                if spullen[i].prijs <= person.geld:
+                    self.kopen(spullen[i])
+                else:
+                    print('Je hebt niet genoeg geld.')
+                print(spullen[i].item_name)
+            
+    def kopen(self, item):
+        person.geld -= item.prijs
+        person.pick_up(item)
+        
+        
+        
 
 
 class Controller: # Begint het spel en laat het menu zien
@@ -395,7 +417,7 @@ class Controller: # Begint het spel en laat het menu zien
         while self.keuze != 'S':
             clear_screen()
             print_menu()
-            self.keuze = input("Kies(K/L/I/E/S): ")
+            self.keuze = input("Kies(K/L/I/E/W/S): ")
             clear_screen()
             if self.keuze == 'L' or self.keuze == 'l':
                 person.goto_room()
@@ -406,6 +428,8 @@ class Controller: # Begint het spel en laat het menu zien
                 self.keuze = person.kijken()
             elif self.keuze == 'E' or self.keuze == 'e':
                 person.eten()
+            elif self.keuze == 'W' or self.keuze == 'w':
+                winkel.laten_zien()
             elif self.keuze == 'S' or self.keuze == 's':
                 print_regel_los('Doei doei')
             else:
@@ -420,10 +444,15 @@ class Controller: # Begint het spel en laat het menu zien
 
 
 class Item: #Geeft de items een naam en een soort
-    def __init__(self, _name, _itemtype, _damage):
+    def __init__(self, _name, _itemtype, _damage_levens, _letter, _prijs):
         self.item_name = _name
         self.item_type = _itemtype
-        self.damage = _damage
+        self.damage_levens = _damage_levens
+        self.letter = _letter
+        self.prijs = _prijs
+        
+    def print_kopen(self):
+        print_regel_winkel(self.item_name + " +" + str(self.damage_levens), self.letter, str(self.prijs))
         
 
 class Enemy:
@@ -447,34 +476,34 @@ class Enemy:
             self.life -= 3
             print_header('Monster: -3')
         else:
-            self.life -= wapen.damage
-            print_header('Monster: -' + str(wapen.damage))
+            self.life -= wapen.damage_levens
+            print_header('Monster: -' + str(wapen.damage_levens))
         
             
     def wapen(self):
         if zwaard in person.inventory:
             keuze = input('Wil je het zwaard gebruiken om aan te vallen(y/n): ')
             if keuze == 'y':
-                print('Oke laten we aan vallen met het zwaard')
+                print('Wapen: Zwaard')
                 return(zwaard)
             if boog in person.inventory:
                 keuze = input('Wil je de pijl en boog gebruiken om aan te vallen(y/n): ')
                 if keuze == 'y':
-                    print('Oke laten we aan vallen met de pijl en boog')
+                    print('Wapen: Pijl en boog')
                     return(boog)
                 else:
-                    print('Je gaat je vuisten gebruiken')
+                    #print('Je gaat je vuisten gebruiken')
                     return(0)
             else:
-                print('Je gaat je vuisten gebruiken')
+                #print('Je gaat je vuisten gebruiken')
                 return(0)
         elif boog in person.inventory:
             keuze = input('Wil je de pijl en boog gebruiken om aan te vallen(y/n): ')
             if keuze == 'y':
-                print('Oke laten we aan vallen met de pijl en boog')
+                print('Wapen: Pijl en boog')
                 return(boog)
             else:
-                print('Je gaat je vuisten gebruiken')
+                #print('Je gaat je vuisten gebruiken')
                 return(0)
         else:
             print('Je gaat je vuisten gebruiken')
@@ -561,12 +590,13 @@ def print_header(zin):
   
 def print_menu():
     print("+" + "-"*(SCHERMBREEDTE-2) + "+")
-    print_regel_dubbel("Huidige locatie: " + person.current_room.name, "Levens: " + str(person.life))     , 
+    print(("| {:" + str(int(SCHERMBREEDTE*(1/2)) - 3)+ "}  {:^" + str(int(SCHERMBREEDTE*(1/4)) - 2)+ "} {:^" + str(int(SCHERMBREEDTE*(1/4)) - 2)+ "} |").format("Huidige locatie: " + person.current_room.name, "Levens: " + str(person.life), 'Geld: ' + str(person.geld)))
     print("+" + "-"*(SCHERMBREEDTE-2) + "+")
     print_regel("Kamer bekijken -- K")
     print_regel("Lopen -- L")
     print_regel("Inventory bekijken -- I")
     print_regel("Eten -- E")
+    print_regel("Winkel -- W")
     print_regel("Stoppen -- S")
     print("+" + "-"*(SCHERMBREEDTE-2) + "+")
     
@@ -581,6 +611,12 @@ def print_regel_los(regel):
 def print_regel_dubbel(zin1, zin2):
     print(("| {:"+ str(int((SCHERMBREEDTE/2))-2) +"}{:^"+ str(int((SCHERMBREEDTE/2))-1) +"}|").format(zin1, zin2))
     
+def print_regel_winkel(regel1, regel2, regel3):
+    print(("| {:" + str(int(SCHERMBREEDTE*(1/2)) - 3)+ "} | {:^" + str(int(SCHERMBREEDTE*(1/4)) - 4)+ "} |{:^" + str(int(SCHERMBREEDTE*(1/4)) - 2)+ "} |").format(regel1, regel2, regel3))
+    
+def print_regel_inv(regel1, regel2, regel3, regel4):
+    print(("| {:" + str(int(SCHERMBREEDTE*(1/3)) - 1)+ "}|{:^" + str(int(SCHERMBREEDTE*(1/6)) - 1)+ "}| {:" + str(int(SCHERMBREEDTE*(1/3)) - 2)+ "}|{:^" + str(int(SCHERMBREEDTE*(1/6)) - 1)+ "}|").format(regel1, regel2, regel3, regel4))
+
 def print_world_rand():
     print(16*' ' + '+' + 15*'-' + '+')
     print((16*' ' + "|{:^" + str(15)+ "}|").format(person.current_room.exits[0].name))
@@ -616,14 +652,25 @@ MAX_WOORD_LENGTE = 20
 MONSTERS = [Enemy_Plant(), Enemy_Water(), Enemy_Fire(), Enemy()]
 
 #Maakt de Items
-appel = Item('Appel', 'eten', 0)
-brood = Item('Brood', 'eten', 0)
-zwaard = Item('Zwaard', 'wapen', 6)
-boog = Item('Pijl en Boog', 'wapen', 8)
-sleutel_goud = Item('Gouden Sleutel', 'sleutel', 0)
-sleutel_zilver = Item('Zilvere Sleutel', 'sleutel', 0)
+appel = Item('Appel', 'eten', 3, 'A', 4)
+brood = Item('Brood', 'eten', 7, 'B', 7)
+taart = Item('Taart', 'eten', 10, 'T', 10)
+soep = Item('Soep', 'eten', 15, 'S', 14)
+ijs = Item('Ijs', 'eten', 20, 'I', 17)
+handschoen = Item('Handschoen', 'wapen', 4, 'H', 8)
+zwaard = Item('Zwaard', 'wapen', 6, 'Z', 15)
+boog = Item('Pijl en Boog', 'wapen', 8, 'B', 20)
+mes = Item('Mes', 'wapen', 15, 'M', 30)
+knuppel = Item('Knuppel', 'wapen', 20, 'K', 45)
+
+
+spullen = [appel, brood, taart, soep, ijs, handschoen, zwaard, boog, mes, knuppel]
+
+sleutel_goud = Item('Gouden Sleutel', 'sleutel', 0, 'G', 0)
+sleutel_zilver = Item('Zilvere Sleutel', 'sleutel', 0, 'G', 0)
 
 #Maakt speler en start het spel
+winkel = Winkel()
 person = Player()
 speel = Controller()
 speel.play_game()
