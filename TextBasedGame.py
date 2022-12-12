@@ -414,6 +414,7 @@ class Controller: # Begint het spel en laat het menu zien
     def play_game(self):
         mana = World("Mana")
         mana.create_world()
+        self.uitleg()
         while self.keuze != 'S':
             clear_screen()
             print_menu()
@@ -438,7 +439,24 @@ class Controller: # Begint het spel en laat het menu zien
             if person.inventory.count(sleutel_goud) == 3: #Als je 3 sleutels hebt dan win je
                 self.keuze = 'S'
                 print_regel_los("Je hebt de goude sleutel gevonden! Je hebt gewonnen")
-                    
+    
+    def uitleg(self):
+        print_header('Welkom bij ... ik zal je even uitleggen hoe dit spel werkt.')
+        print_regel(' ')
+        print_regel('Je komt in een huis terecht. In dit huis liggen 3 gouden sleutels verstopt.')
+        print_regel('Je kan door het huis lopen, in elke kamer zal je een monster aantreffen.')
+        print_regel('Het monster kan je verslaan door het gebruiken van je vuisten.')
+        print_regel('Je kan ook betere wapens kopen.')
+        print_regel('Hierdoor zal het verslaan van de monsters makkelijker worden.')
+        print_regel('Door het vermoorden van de monsters kan je geld verdienden.')
+        print_regel('Met dit geld kan je wapens en eten kopen.')
+        print_regel('Door te eten zal je meer levens krijgen.')
+        print_regel('Ook zijn er een paar kamers die op slot zitten.')
+        print_regel('Daarvoor zal je een zilvere sleutel moeten vinden.')
+        print_regel('Die liggen ook verstopt in het huis.')
+        print_regel('')
+        print_footer('- Veel succes!')
+        enter()
 
 
 
@@ -472,55 +490,28 @@ class Enemy:
         
     def attacked(self):
         wapen = self.wapen()
-        if wapen == 0:
-            self.life -= 3
-            print_header('Monster: -3')
-        else:
-            self.life -= wapen.damage_levens
-            print_header('Monster: -' + str(wapen.damage_levens))
+        self.life -= wapen.damage_levens
+        print_header('Monster: -' + str(wapen.damage_levens))
         
             
     def wapen(self):
-        if zwaard in person.inventory:
-            keuze = input('Wil je het zwaard gebruiken om aan te vallen(y/n): ')
-            if keuze == 'y':
-                print('Wapen: Zwaard')
-                return(zwaard)
-            if boog in person.inventory:
-                keuze = input('Wil je de pijl en boog gebruiken om aan te vallen(y/n): ')
-                if keuze == 'y':
-                    print('Wapen: Pijl en boog')
-                    return(boog)
-                else:
-                    #print('Je gaat je vuisten gebruiken')
-                    return(0)
-            else:
-                #print('Je gaat je vuisten gebruiken')
-                return(0)
-        elif boog in person.inventory:
-            keuze = input('Wil je de pijl en boog gebruiken om aan te vallen(y/n): ')
-            if keuze == 'y':
-                print('Wapen: Pijl en boog')
-                return(boog)
-            else:
-                #print('Je gaat je vuisten gebruiken')
-                return(0)
-        else:
-            print('Je gaat je vuisten gebruiken')
-            return(0)
-        
-
-    def checklife(self):
-        if self.life <= 0:
-            print("I am dead")
-        else:
-            print(str(self.life) + " lifes left.")
-
-    def heal(self):
-        self.life += 2
+        clear_screen()
+        wapens_inv = [vuisten]
+        for i in range(len(wapens)):
+            if wapens[i] in person.inventory:
+                wapens_inv.append(wapens[i])
+                
+        print_header('Jouw wapens: ')
+        for i in range(len(wapens_inv)):
+            print_regel(wapens_inv[i].item_name)
+        keuze = input('Welke wil je gebruiken: ')
+        for i in range(len(wapens_inv)):
+            if keuze == wapens_inv[i].letter:
+                return(wapens_inv[i])
+        clear_screen()
     
     
-class Enemy_Fire(Enemy):
+class Enemy_Fire(Enemy): #Speciaal monster
     def __init__(self):
         Enemy.__init__(self)
         self.life = LEVENS_SPECIAALMONSTER
@@ -539,7 +530,7 @@ class Enemy_Fire(Enemy):
         else:
             Enemy.attack(self)
             
-class Enemy_Water(Enemy):
+class Enemy_Water(Enemy): #Speciaal monster
     def __init__(self):
         Enemy.__init__(self)
         self.life = LEVENS_SPECIAALMONSTER
@@ -558,7 +549,7 @@ class Enemy_Water(Enemy):
         else:
             Enemy.attack(self)
             
-class Enemy_Plant(Enemy):
+class Enemy_Plant(Enemy):#Speciaal Monster
     def __init__(self):
         Enemy.__init__(self)
         self.life = LEVENS_SPECIAALMONSTER
@@ -575,16 +566,22 @@ class Enemy_Plant(Enemy):
             print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(person.life))
         else:
             Enemy.attack(self)
-            
+      
+      
+      
+      
 def print_footer(zin):
     print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(zin))
-    print("="*(SCHERMBREEDTE))
+    #print("="*(SCHERMBREEDTE))
+    print("+" + "-"*(SCHERMBREEDTE-2) + "+")
     
 def print_footer_los():
-    print("="*(SCHERMBREEDTE))
+    #print("="*(SCHERMBREEDTE))
+    print("+" + "-"*(SCHERMBREEDTE-2) + "+")
     
 def print_header(zin):
-    print("="*(SCHERMBREEDTE))
+    print("+" + "-"*(SCHERMBREEDTE-2) + "+")
+    #print("="*(SCHERMBREEDTE))
     print(("| {:" + str(SCHERMBREEDTE - 4)+ "} |").format(zin))
 
   
@@ -629,7 +626,7 @@ def print_world_rand():
 
 def clear_screen(): #Maakt het scherm leeg
     #os.system("cls" if os.name == "nt" else "clear")
-    print('\n\n\n\n\n\n\n\n\n\n\n') #Tijdelijke oplossing
+    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n') #Tijdelijke oplossing
 
 def enter():
     verder = input('Klik enter om verder te gaan...')
@@ -663,7 +660,10 @@ boog = Item('Pijl en Boog', 'wapen', 8, 'B', 20)
 mes = Item('Mes', 'wapen', 15, 'M', 30)
 knuppel = Item('Knuppel', 'wapen', 20, 'K', 45)
 
+vuisten = Item('Vuisten', 'wapen', 3, 'V', 0)
 
+eten = [appel, brood, taart, soep, ijs]
+wapens = [handschoen, zwaard, boog, mes, knuppel]
 spullen = [appel, brood, taart, soep, ijs, handschoen, zwaard, boog, mes, knuppel]
 
 sleutel_goud = Item('Gouden Sleutel', 'sleutel', 0, 'G', 0)
