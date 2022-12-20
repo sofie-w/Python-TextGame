@@ -121,13 +121,14 @@ class World: #Maakt een random wereld
 
     def create_world(self):
         
-        for i in range(5):
+        for i in range(4):
             self.poss_items.append(appel)
-        for i in range(5):
+        for i in range(4):
             self.poss_items.append(brood)
         self.poss_items.append(zwaard)
         self.poss_items.append(pijl_boog)
-        self.poss_items.append(sleutel_goud)
+        for i in range(3):
+            self.poss_items.append(sleutel_goud)
         for i in range(3):
             self.poss_items.append(sleutel_zilver)
             
@@ -201,7 +202,7 @@ class World: #Maakt een random wereld
         hobbykamer = Room('hobbykamer', self, item, monster)
         item = self.random_item()
         monster = self.random_enemy()
-        fitnessruimte = Room('fitnessruimte', self, item, monster)
+        balzaal = Room('balzaal', self, item, monster)
         item = self.random_item()
         monster = self.random_enemy()
         studeerkamer = Room('studeerkamer', self, item, monster)
@@ -217,6 +218,7 @@ class World: #Maakt een random wereld
         item = self.random_item()
         monster = self.random_enemy()
         zolder = Room('zolder', self, item, monster) #!
+        #garderobe, ridderzaal, filmkamer
         
         
         self.add_room(keuken)
@@ -229,7 +231,7 @@ class World: #Maakt een random wereld
         self.add_room(bibliotheek)
         self.add_room(slaapkamer)
         self.add_room(hobbykamer)
-        self.add_room(fitnessruimte)
+        self.add_room(balzaal)
         self.add_room(studeerkamer)
         self.add_room(serre)        
         self.add_room(garage)
@@ -510,7 +512,7 @@ class Enemy:
         fouten = ('Het monster probeert je aan te vallen maar hij struikeld over een bananenschil.',
                   'Terwijl het monster je aanvalt wordt hij afgeleid door een raar geluid.',
                   'Het monster schrikt zo van je dat hij omvalt.')
-        print_regel(fouten[random.randint(0,len(fouten))])
+        print_regel(fouten[random.randint(0,len(fouten)-1)])
         
             
     def wapen(self):
@@ -544,6 +546,7 @@ class Special_Enemy(Enemy):
         if random.randint(0, 3) == 1:
             persoon.life -= 6
             Enemy.attacked(self)
+            print_regel('Hahjbdeouhfvoefvefogv')
             print_regel(self.aanval)
             print_regel('Jij: -6')
             print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(persoon.life))
@@ -617,10 +620,10 @@ def enter():
 hight = 4
 width = 4
 LEVENS_SPELER = 50
-LEVENS_MONSTER = 10
-LEVENS_SPECIAALMONSTER = 15
-DAMAGE_MONSTER = 4
-DAMAGE_SPECIAALMONSTER = 6
+LEVENS_MONSTER = 16
+LEVENS_SPECIAALMONSTER = 20
+DAMAGE_MONSTER = 7
+DAMAGE_SPECIAALMONSTER = 9
 WAARDE_MONSTER = 5
 WAARDE_SPECIAALMONSTER = 10
 SCHERMBREEDTE = 100
