@@ -28,7 +28,7 @@ class Controller: # Begint het spel en laat het menu zien
             elif self.keuze == 'K' or self.keuze == 'k':
                 self.keuze = persoon.kijken()
             elif self.keuze == 'E' or self.keuze == 'e':
-                persoon.eten()
+                persoon.eten(persoon)
             elif self.keuze == 'W' or self.keuze == 'w':
                 winkel.laten_zien(persoon)
             elif self.keuze == 'S' or self.keuze == 's':

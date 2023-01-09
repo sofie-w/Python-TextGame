@@ -1,5 +1,5 @@
 from gegevens import LEVENS_MONSTER, LEVENS_SPECIAALMONSTER, DAMAGE_MONSTER, DAMAGE_SPECIAALMONSTER, WAARDE_MONSTER, WAARDE_SPECIAALMONSTER
-from print_functies import clear_screen, print_header, print_regel, print_footer
+from print_functies import clear_screen, print_header, print_regel, print_footer, print_regel_los
 from items import wapens, vuisten
 import random
 
@@ -31,7 +31,7 @@ class Enemy:
         fouten = ('Het monster probeert je aan te vallen maar hij struikeld over een bananenschil.',
                   'Terwijl het monster je aanvalt wordt hij afgeleid door een raar geluid.',
                   'Het monster schrikt zo van je dat hij omvalt.')
-        print_regel(fouten[random.randint(0,len(fouten))])
+        print_regel(fouten[random.randint(0,len(fouten)-1)])
         
             
     def wapen(self, persoon):
@@ -40,16 +40,25 @@ class Enemy:
         for i in range(len(wapens)):
             if wapens[i] in persoon.inventory:
                 wapens_inv.append(wapens[i])
-                
-        print_header('Jouw wapens: ')
-        for i in range(len(wapens_inv)):
-            print_regel(wapens_inv[i].item_name + '(' + wapens_inv[i].letter + '): -' + str(wapens_inv[i].damage_levens))
-        print_regel('')
-        keuze = input('| Welke wil je gebruiken: ')
-        clear_screen()
-        for i in range(len(wapens_inv)):
-            if keuze == wapens_inv[i].letter:
-                return(wapens_inv[i])
+        
+        door = ja
+        while door == ja:
+            teller = 0
+            print_header('Jouw wapens: ')
+            for i in range(len(wapens_inv)):
+                print_regel(wapens_inv[i].item_name + '(' + wapens_inv[i].letter + '): -' + str(wapens_inv[i].damage_levens))
+            print_regel('')
+            keuze = input('| Welke wil je gebruiken: ')
+            keuze = keuze.capitalize()
+            clear_screen()
+            for i in range(len(wapens_inv)):
+                if keuze == wapens_inv[i].letter:
+                    return(wapens_inv[i])
+                    door = nee
+                else:
+                    teller +=1
+            if teller == len(wapens_inv):
+                print_regel_los('Dit wapen bestaan niet.')
             
 class Special_Enemy(Enemy):
     def __init__(self, _soort, _aanval):
@@ -64,7 +73,6 @@ class Special_Enemy(Enemy):
         if random.randint(0, 3) == 1:
             persoon.life -= 6
             Enemy.attacked(self, persoon)
-            #print_regel('Hahjbdeouhfvoefvefogv')
             print_regel(self.aanval)
             print_regel('Jij: -6')
             print_footer('Monster: '+ str(self.life) + ' - Jij: ' + str(persoon.life))

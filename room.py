@@ -49,15 +49,15 @@ class Room:
             print_header('De deur zit op slot je hebt een zilvere sleutel nodig om hem te openen.')
             if sleutel_zilver in persoon.inventory:
                 print_footer_los()
-                door = 'a'
-                while door != 'j' or door != 'J' or door != 'n' or door != 'N':
-                    door = input('Wil je de zilvere sleutel gebruiken(j/n): ')
-                    if door == 'j' or door == 'J':
+                gebruiken = 'a'
+                while gebruiken != 'y' or gebruiken != 'Y' or gebruiken != 'n' or gebruiken != 'N':
+                    gebruiken = input('Wil je de zilvere sleutel gebruiken(y/n): ')
+                    if gebruiken == 'y' or gebruiken == 'Y':
                         self.locked = False
                         print_regel('De kamer is open!')
                         enter()
                         clear_screen()
-                    elif door != 'n' or door != 'N':
+                    elif gebruiken != 'n' or gebruiken != 'N':
                         print_regel('Je hebt iets verkeerd getypt.')
                     
             else:
@@ -70,36 +70,40 @@ class Room:
             print_regel('')
             print_footer('Monster: '+ str(self.monster.life) + ' - Jij: ' + str(persoon.life))
             vraag = 'a'
-            while vraag != 'y' and vraag != 'Y' and vraag != 'n' and vraag != 'N':
+            door = 'a'
+            while vraag != 'y' and vraag != 'Y' and vraag != 'n' and vraag != 'N' and door != 'v':
                 vraag = input('Wil je het '+ self.monster.soort +' aanvallen(y/n): ')
-                door = 'a'
+                
                 
                 if vraag == 'y' or vraag == 'Y':
                     while self.monster.life > 0 and persoon.life > 0 and door != 'v':
                         self.monster.attack(persoon)
                         if self.monster.life > 0 and persoon.life > 0:
-                            vraag = input('Wil je verder met aanvallen(a) of wil je vluchten(v) (a/v): ')
-                            if vraag == 'a':
-                                clear_screen()
-                            elif vraag == 'v':
-                                door = 'v'
+                            vraag = 'g'
+                            while vraag != 'A' and vraag != 'a' and vraag != 'V' and vraag != 'v':
+                                vraag = input('Wil je verder met aanvallen(a) of wil je vluchten(v) (a/v): ')
+                                if vraag == 'a' or vraag == 'A':
+                                    clear_screen()
+                                elif vraag == 'v' or vraag == 'V':
+                                    door = 'v'
+                                    clear_screen()
+                                else:
+                                    print_regel_los('Je hebt iets verkeerd ingevuld.')
                     if persoon.life <= 0:
                         
                         print_regel_los('Je bent dood')
                         return('S')
                     
                     elif self.monster.life <= 0:
+                        clear_screen()
                         print_regel_los('Je hebt het monster verslagen! Je hebt ' + str(self.monster.waarde) + ' coins verdiend.')
                         persoon.geld += self.monster.waarde
-                        vraag2 = input('Wil je een ' + self.items[0].item_name + ' meenemen(y/n): ')
-                        if vraag2 == 'y':
-                            item = self.items[0]
-                            self.items.remove(self.items[0])
-                            return(item)
-                        else:
-                            return(0)
+                        item = self.items[0]
+                        self.items.remove(self.items[0])
+                        return(item)
 
                 elif vraag == 'n' or vraag == 'N':
+                    clear_screen()
                     return(0)
                 else:
                     clear_screen()
@@ -107,8 +111,5 @@ class Room:
                     
                     
         elif len(self.items) <= 0:
-            print_regel_los('Je bent nu in de ' + self.name + '. De kamer lijkt leeg. Wil je verder(V) gaan of nog even zoeken(Z)')
-            keuze = input('(V/Z): ')
-            if keuze == 'Z':
-                print_regel_los('De kamer is nog steeds leeg')
+            print_regel_los('Je bent nu in de ' + self.name + '. De kamer lijkt leeg. Je hebt hier al geweest.')
             return(0)

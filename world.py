@@ -132,7 +132,7 @@ class World: #Maakt een random wereld
         self.add_room(bibliotheek)
         self.add_room(slaapkamer)
         self.add_room(hobbykamer)
-        self.add_room(fitnessruimte)
+        self.add_room(balzaal)
         self.add_room(studeerkamer)
         self.add_room(serre)        
         self.add_room(garage)

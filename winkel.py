@@ -4,8 +4,8 @@ from items import appel, brood, taart, soep, ijs, handschoen, zwaard, pijl_boog,
 
 class Winkel:      
     def laten_zien(self, persoon):
-        door = True
-        while door == True:
+        door = ja
+        while door == ja:
             print("+" + "-"*(SCHERMBREEDTE-2) + "+")
             self.print_regel_winkel("Wat", "Letter", "Prijs")
             print("+" + "-"*(SCHERMBREEDTE-2) + "+")
@@ -21,7 +21,8 @@ class Winkel:
             knuppel.print_kopen()
             print("+" + "-"*(SCHERMBREEDTE-2) + "+")
         
-            keuze = input("Jouw geld: " + str(persoon.geld) + " \nWat wil je kopen: ")
+            keuze = input("Jouw geld: " + str(persoon.geld) + " \nWat wil je kopen, klik anders op enter: ")
+            keuze = keuze.capitalize()
             clear_screen()
             teller = 0
             for i in range(len(spullen)):
@@ -32,12 +33,16 @@ class Winkel:
                     else:
                         clear_screen()
                         print_regel_los('Je hebt niet genoeg geld.')
-                    door = False
+                    door = nee
                 else:
                     teller += 1
             if teller == len(spullen):
                 clear_screen()
-                print_regel_los('Dit item bestaan niet.')
+                if keuze != '':
+                    print_regel_los('Dit item bestaan niet.')
+                else:
+                    door = nee
+                
                 
     def print_regel_winkel(self, regel1, regel2, regel3):
         print(("| {:" + str(int(SCHERMBREEDTE*(1/2)) - 3)+ "} | {:^" + str(int(SCHERMBREEDTE*(1/4)) - 4)+ "} |{:^" + str(int(SCHERMBREEDTE*(1/4)) - 2)+ "} |").format(regel1, regel2, regel3))
