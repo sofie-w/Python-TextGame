@@ -95,8 +95,9 @@ class Room:
                         return('S')
                     
                     elif self.monster.life <= 0:
-                        clear_screen()
+                        #clear_screen()
                         print_regel_los('Je hebt het monster verslagen! Je hebt ' + str(self.monster.waarde) + ' coins verdiend.')
+                        enter()
                         persoon.geld += self.monster.waarde
                         item = self.items[0]
                         self.items.remove(self.items[0])

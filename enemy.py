@@ -41,8 +41,8 @@ class Enemy:
             if wapens[i] in persoon.inventory:
                 wapens_inv.append(wapens[i])
         
-        door = ja
-        while door == ja:
+        door = 'ja'
+        while door == 'ja':
             teller = 0
             print_header('Jouw wapens: ')
             for i in range(len(wapens_inv)):
@@ -54,7 +54,7 @@ class Enemy:
             for i in range(len(wapens_inv)):
                 if keuze == wapens_inv[i].letter:
                     return(wapens_inv[i])
-                    door = nee
+                    door = 'nee'
                 else:
                     teller +=1
             if teller == len(wapens_inv):

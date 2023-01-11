@@ -4,7 +4,7 @@ from items import sleutel_zilver, spullen
 
 class Player: #Lopen en de inventory
     def __init__(self):
-        self.inventory = [sleutel_zilver]
+        self.inventory = []
         self.current_room = 'I'
         self.life = LEVENS_SPELER
         self.geld = BEGIN_GELD
@@ -106,24 +106,34 @@ class Player: #Lopen en de inventory
         print(("| {:" + str(int(SCHERMBREEDTE*(1/3)) - 1)+ "}|{:^" + str(int(SCHERMBREEDTE*(1/6)) - 1)+ "}| {:" + str(int(SCHERMBREEDTE*(1/3)) - 2)+ "}|{:^" + str(int(SCHERMBREEDTE*(1/6)) - 1)+ "}|").format(regel1, regel2, regel3, regel4))
     
     def eten(self, persoon):
-        print_header('Je hebt nu ' + str(persoon.life) + ' levens.')
-        self.print_regel_inv('Eten', 'Aantal', 'Levens', 'Letter')
-        for i in range(int(len(spullen)/2)):
-            self.print_regel_inv(spullen[i].item_name, str(self.inventory.count(spullen[i])), str(spullen[i].damage_levens) + ' levens', spullen[i].letter)
-        print_footer_los()
+        goed = 'nee'
+        while goed == 'nee':
+            teller = 0
+            print_header('Je hebt nu ' + str(persoon.life) + ' levens.')
+            self.print_regel_inv('Eten', 'Aantal', 'Levens', 'Letter')
+            for i in range(int(len(spullen)/2)):
+                self.print_regel_inv(spullen[i].item_name, str(self.inventory.count(spullen[i])), str(spullen[i].damage_levens) + ' levens', spullen[i].letter)
+            print_footer_los()
         
-        keuze = input('Wat wil je eten: ')
-        keuze = keuze.capitalize()
-        fout = True
-        for i in range(int(len(spullen)/2)):
-            if keuze == spullen[i].letter:
-                fout = False
-                if self.inventory.count(spullen[i]) > 0:
-                    self.inventory.remove(spullen[i])
-                    self.life = self.life + spullen[i].damage_levens
-                else:
+            keuze = input('Wat wil je eten, klik anders op enter: ')
+            keuze = keuze.capitalize()
+            if keuze == '':
+                clear_screen()
+                goed = 'ja'
+            else:
+                for i in range(int(len(spullen)/2)):
+                    teller += 1
+                    if keuze == spullen[i].letter:
+                        goed = 'ja'
+                        if self.inventory.count(spullen[i]) > 0:
+                            self.inventory.remove(spullen[i])
+                            self.life = self.life + spullen[i].damage_levens
+                        else:
+                            clear_screen()
+                            print_regel_los('Je hebt geen ' + spullen[i].item_name.lower() + '.')
+                            enter()
+                            
+                if teller == int(len(spullen)/2):
                     clear_screen()
-                    print_regel_los('Je hebt geen ' + spullen[i].item_name.lower() + '.')
-                    enter()
-        if fout:
-            clear_screen()
+                    print_regel_los('Jouw input: '+ keuze +', ken ik niet, probeer het opnieuw.')
+            

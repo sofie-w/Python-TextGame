@@ -1,8 +1,9 @@
 from gegevens import SCHERMBREEDTE
+import os
 
 def clear_screen(): #Maakt het scherm leeg
-    #os.system("cls" if os.name == "nt" else "clear")
-    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n') #Tijdelijke oplossing
+    os.system("cls" if os.name == "nt" else "clear")
+    #print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n') #Tijdelijke oplossing
 
 def enter():
     verder = input('Klik enter om verder te gaan...')
